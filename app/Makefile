@@ -1,6 +1,6 @@
 run: build
 	cd build
-	python3 -m http.server --directory build
+	python3 -m http.server --directory build --bind 127.0.0.1
 
 build: copy render
 	
