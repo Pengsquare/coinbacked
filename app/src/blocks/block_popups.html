@@ -1,0 +1,59 @@
+<div class="modal is-hidden" id="popup-alpha">
+    <div class="modal-content">
+        <div class="card">
+            <header><h4>Hi there!</h4></header>
+            <p> 
+                We are still in early alpha! The whole app runs on devnet only. If you don't understand what that means, it might be too early to play around with coinbacked.
+                <br/><br/>
+                The team
+            </p>
+            <footer class="is-right">
+                <div class="button primary popup-okay">Okay</div>
+            </footer>   
+        </div>
+    </div>
+</div>
+
+<div class="modal is-hidden" id="popup-start-backing-info">
+    <div class="modal-content">
+        <div class="card">
+            <header><h4>About Backing</h4></header>
+            <p> 
+                Learn shit
+            </p>
+            <footer class="is-right">
+                <div class="button outline popup-okay">Cancel</div>
+                <div class="button primary popup-okay">Yes, let's go</div>
+            </footer>   
+        </div>
+    </div>
+</div>
+
+<div class="modal is-hidden" id="popup-validate-info">
+    <div class="modal-content">
+        <div class="card">
+            <header><h4>What is Validation?</h4></header>
+            <p> 
+                You can validate the current backing setup on-chain. The coinbacked contract will be executed and check general settings (e.g., all accounts valid and correctly maintained). This is not a holder account specific validation . <br/><br/> All results will be logged and stored on as transaction log on-chain. Execution will generate a processing fee.
+            </p>
+            <footer class="is-right">
+                <div class="button outline popup-okay">Cancel</div>
+                <div class="button primary popup-continue">Yes, let's go</div>
+            </footer>   
+        </div>
+    </div>
+</div>
+
+<div class="modal is-hidden" id="popup-validation-results">
+    <div class="modal-content">
+        <div class="card">
+            <header><h4>Validation Results</h4></header>
+            <p id="popup-validation-results-logs"> 
+
+            </p>
+            <footer class="is-right">
+                <div class="button outline popup-okay">Okay</div>
+            </footer>   
+        </div>
+    </div>
+</div>
