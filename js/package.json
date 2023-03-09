@@ -1,0 +1,30 @@
+{
+    "name": "coinbacked",
+    "version": "0.4.2",
+    "description": "Coinbacked NFT protocol library for Solana.",
+    "scripts": {
+      "build": "webpack",
+      "fiddle": "tsc -p tsconfig.json; node dist/out-tsc/fiddle/node/fiddle.js",
+      "fiddle-web": "webpack; cp -f dist/coinbacked.js fiddle/web/",
+      "fiddle-web-start-server": "python3 -m http.server --directory fiddle/web"
+    },
+    "type": "commonjs",
+    "repository": {
+      "type": "git",
+      "url": "git+ssh://git@github.com/myname/myrepo"
+    },
+    "keywords": [
+      "disable-with"
+    ],
+    "dependencies": {
+      "@solana/web3.js": "1.62.0"
+    },
+    "devDependencies": {
+      "terser-webpack-plugin": "^5.1.2",
+      "ts-loader": "^9.2.2",
+      "typescript": "^4.3.2",
+      "webpack": "^5.38.0",
+      "webpack-cli": "^4.7.0"
+    }
+  }
+  
