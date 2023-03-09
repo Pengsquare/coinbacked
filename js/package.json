@@ -6,7 +6,8 @@
       "build": "webpack",
       "fiddle": "tsc -p tsconfig.json; node dist/out-tsc/fiddle/node/fiddle.js",
       "fiddle-web": "webpack; cp -f dist/coinbacked.js fiddle/web/",
-      "fiddle-web-start-server": "python3 -m http.server --directory fiddle/web"
+      "fiddle-web-start-server": "python3 -m http.server --directory fiddle/web --bind 127.0.0.1",
+      "clean-all": "rm -rf node_modules; rm -rf dist; rm -rf fiddle/web/coinbacked.js; rm -f package-lock.json"
     },
     "type": "commonjs",
     "repository": {

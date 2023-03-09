@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" class="has-background-dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cash/8.1.0/cash.min.js"></script>
+  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+
+  <script src="coinbacked.js"></script>
+
+	
+    <script>
+        function getProvider()
+        {
+            if ("solana" in window) 
+            {
+                const provider = window.solana;
+                if (provider.isPhantom) 
+                {
+                      return provider;
+                }
+            }
+            window.open("https://phantom.app/", "_blank");
+        }
+
+        $(function ()
+         {
+            $("#connect-wallet").on("click", () => 
+            {
+                let provider = getProvider();
+              if (provider)
+              {
+                provider.on("connect", () => 
+                {
+                  let payer = provider.publicKey;
+
+                  let connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
+                  let api = new coinbackedWeb3.api(connection);
+                  let instructions = new coinbackedWeb3.instructions(api);
+                  
+                  let mint = new solanaWeb3.PublicKey("<>");
+
+                  //instructions.creationInstructions(mint, payer, BigInt(1000)).then((instructions) => 
+                  //instructions.validationInstructions(mint, payer).then((instructions) =>  
+
+                  instructions.addBackingLamportsInstructions(mint, payer, BigInt(1000)).then((instructions) =>  
+                  {
+                    var transaction = new solanaWeb3.Transaction();
+                    instructions.forEach((instruction) => transaction.add(instruction));
+
+                    connection.getRecentBlockhash().then((hash) => 
+                    {
+                      transaction.recentBlockhash = hash.blockhash;
+                      transaction.feePayer = payer;
+
+                      window.solana.signTransaction(transaction).then((signedTransaction) => 
+                      {
+                        connection.sendRawTransaction(signedTransaction.serialize()).then((signature) => 
+                        {
+                          alert(signature);
+                        });
+                      });
+                    });
+                  });
+                  
+                });
+                provider.connect();
+              }
+            });
+           
+            
+         });
+   </script>
+
+
+  <title>Web test coinbacked</title>
+
+</head>
+
+  <body>
+    <div id="connect-wallet">connect wallet</div>
+
+  </body>
+
+</html>
