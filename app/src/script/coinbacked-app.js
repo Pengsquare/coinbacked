@@ -167,7 +167,9 @@ coinbackedApp =
                         $('#concept').hide();
                         $('#info-block').hide();
 
+
                         coinbackedApp.togglePopup('#popup-alpha');
+                        $('.pageloader').removeClass('is-active');
 
                     }
 
@@ -254,9 +256,9 @@ coinbackedApp =
 
     getProvider: function()
     {
-        if ("solana" in window) 
+        if ("phantom" in window) 
         {
-            const provider = window.solana;
+            const provider = window.phantom.solana;
             if (provider.isPhantom) 
             {
                 return provider;
