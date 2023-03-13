@@ -269,7 +269,7 @@ export class Instructions
     private static _OPERATION_CREAT_BACKING_ACCOUNT:number = 0;
     private static _OPERATION_VALIDATE_ACCOUNT:number = 1;
     private static _OPERATION_ADD_TO_BACKING_ACCOUNT:number = 2;
-
+    private static _OPERATION_BURN:number = 3;
 
     constructor(api: Api)
     {
@@ -344,8 +344,34 @@ export class Instructions
     }
     
 
-    burnInstructions()
-    {}
+    burnInstructions(mintKey: solanaWeb3.PublicKey, feePayer: solanaWeb3.PublicKey)
+    {
+        return new Promise((resolve, reject) =>
+        {
+            // get required account keys from mint key
+            let backingAccountKey = this._api.getBackingAccountAddress(mintKey).key;
+            let treasuryAccountKey = this._api.getTreasuryAccountAddress().key;
+
+            // build transaction data
+            const transactionData = Buffer.alloc(137);
+            transactionData.writeInt8(Instructions._OPERATION__, 0);
+            /* TODO ToS missing */
+
+            // build an return transaction
+            resolve([new solanaWeb3.TransactionInstruction({
+                keys: [
+                    {pubkey: feePayer, isSigner: true, isWritable: true},
+                    {pubkey: mintKey, isSigner: false, isWritable: false},
+                    {pubkey: backingAccountKey, isSigner: false, isWritable: true},
+                    {pubkey: treasuryAccountKey, isSigner: false, isWritable: true},
+
+                    {pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false},
+                ],
+                programId: coinbackedWeb3.PROGRAM_ID,
+                data: transactionData
+            })]);
+        });
+    }
 
     validationInstructions(mintKey: solanaWeb3.PublicKey, feePayer: solanaWeb3.PublicKey): Promise<[solanaWeb3.TransactionInstruction?]>
     {
