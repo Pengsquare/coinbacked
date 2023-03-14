@@ -120,7 +120,7 @@ coinbackedApp =
                                             "<div id='btn_start_backing_" + element.key + "' class='btn-start-backing button primary outline pull-right non-backed is-hidden'>" +
                                                 "Start backing" +
                                             "</div>" +
-                                            "<div class='button primary outline backed pull-right is-hidden'>" +
+                                            "<div id='btn_burn_" + element.key + "' class='btn-burn button primary outline backed pull-right is-hidden'>" +
                                                 "Burn" +
                                             "</div>" +
                                             "<div id='btn_validate_" + element.key + "' class='btn-validate button primary outline backed pull-right is-hidden'>" +
@@ -161,6 +161,11 @@ coinbackedApp =
                                 });
                                 
                             });
+                        });
+
+                        $('.btn-burn').on('click', (e)=>
+                        {
+                            alert(e.target.id.split("_")[2])
                         });
 
                         $('#hero-intro').hide();

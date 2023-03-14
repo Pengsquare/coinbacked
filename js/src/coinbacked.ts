@@ -271,6 +271,8 @@ export class Instructions
     private static _OPERATION_ADD_TO_BACKING_ACCOUNT:number = 2;
     private static _OPERATION_BURN:number = 3;
 
+    private static _TOKEN_PROGRAM_ID: solanaWeb3.PublicKey = new solanaWeb3.PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
+
     constructor(api: Api)
     {
         this._api = api;
@@ -335,6 +337,7 @@ export class Instructions
                     {pubkey: backingAccountKey, isSigner: false, isWritable: true},
                     {pubkey: treasuryAccountKey, isSigner: false, isWritable: true},
 
+                    {pubkey: Instructions._TOKEN_PROGRAM_ID, isSigner: false, isWritable: false},
                     {pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false},
                 ],
                 programId: coinbackedWeb3.PROGRAM_ID,
@@ -344,32 +347,38 @@ export class Instructions
     }
     
 
-    burnInstructions(mintKey: solanaWeb3.PublicKey, feePayer: solanaWeb3.PublicKey)
+    burnInstructions(mintKey: solanaWeb3.PublicKey, owner: solanaWeb3.PublicKey,)
     {
         return new Promise((resolve, reject) =>
         {
             // get required account keys from mint key
             let backingAccountKey = this._api.getBackingAccountAddress(mintKey).key;
             let treasuryAccountKey = this._api.getTreasuryAccountAddress().key;
+            this._api.getTokenAccountAddress(mintKey, owner).then((tokenAccountKey) =>
+            {
+                const transactionData = Buffer.alloc(137);
+                transactionData.writeInt8(Instructions._OPERATION_BURN, 0);
+                /* TODO ToS missing */
 
-            // build transaction data
-            const transactionData = Buffer.alloc(137);
-            transactionData.writeInt8(Instructions._OPERATION__, 0);
-            /* TODO ToS missing */
+                resolve([new solanaWeb3.TransactionInstruction(
+                    {
+                        keys: [
+                            {pubkey: owner, isSigner: true, isWritable: true},
+                            {pubkey: mintKey, isSigner: false, isWritable: false},
+                            {pubkey: tokenAccountKey, isSigner: false, isWritable: false},
+                            {pubkey: backingAccountKey, isSigner: false, isWritable: true},
+                            {pubkey: treasuryAccountKey, isSigner: false, isWritable: true},
 
-            // build an return transaction
-            resolve([new solanaWeb3.TransactionInstruction({
-                keys: [
-                    {pubkey: feePayer, isSigner: true, isWritable: true},
-                    {pubkey: mintKey, isSigner: false, isWritable: false},
-                    {pubkey: backingAccountKey, isSigner: false, isWritable: true},
-                    {pubkey: treasuryAccountKey, isSigner: false, isWritable: true},
-
-                    {pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false},
-                ],
-                programId: coinbackedWeb3.PROGRAM_ID,
-                data: transactionData
-            })]);
+                            {pubkey: Instructions._TOKEN_PROGRAM_ID, isSigner: false, isWritable: false},
+                            {pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false}
+                        ],
+                        programId: coinbackedWeb3.PROGRAM_ID,
+                        data: transactionData,
+                    })]);
+            }).catch((e) =>
+            {
+                reject("Could not create instruction.")
+            });
         });
     }
 
