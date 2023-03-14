@@ -25,6 +25,9 @@ coinbackedApp =
             connection.sendRawTransaction(signedTransaction.serialize()).then((signature) => 
             {
               success(signature);
+            }, (e)=>
+            {
+                alert(e.logs)
             });
           });
         });
@@ -98,47 +101,91 @@ coinbackedApp =
                     {
                         $('#app-box-info-mint-count').text(coinbackedApp.mintAccounts.length);
                         $('#app-box-info-nft-count').text(nftCounter);
-
+                        var actualCounter = 0;
                         coinbackedApp.mintAccounts.forEach(element =>
                         {
                             let associtatedAccount = coinbackedApp.tokenAccounts.find(token => token.mint == element.key );
+                            if (associtatedAccount.amount > 0)
+                            {   
+                                actualCounter++;
+                                $('#app-box-info-nft-count').text(actualCounter);
 
-                            $('#app-box-list').append(
-                                "<div class='card' style='margin: 20px' id='entry_" + element.key +"'>" +
-                                    "<div class='row'>" + 
-                                        "<div class='col-4 token-info-col'>" + 
-                                            "<header><h4>" +"<span style='font-weight: bold' id='entry_title_" + element.key +"'>Unknown Token</span> (" + coinbackedApp.shortenPublicKeyString(element.key) + ")</h4></header>"+
-                                            api.tokenAmountUI(associtatedAccount.amount, element.decimals)  +
-                                        "</div>" + 
-                                        "<div class='col-2 token-info-col is-hidden backing-info'>" +
-                                            "Your Value <span id='backed_value_token_" + element.key + "'>0.00</span>" +
+                                $('#app-box-list').append(
+                                    "<div class='card' style='margin: 20px' id='entry_" + element.key +"'>" +
+                                        "<div class='row'>" + 
+                                            "<div class='col-4 token-info-col'>" + 
+                                                "<header><h4>" +"<span style='font-weight: bold' id='entry_title_" + element.key +"'>Token</span> (" + coinbackedApp.shortenPublicKeyString(element.key) + ")</h4></header>"+
+                                                api.tokenAmountUI(associtatedAccount.amount, element.decimals)  +
+                                            "</div>" + 
+                                            "<div class='col-2 token-info-col is-hidden backing-info'>" +
+                                                "Your Value <span id='backed_value_token_" + element.key + "'>0.00</span>" +
+                                            "</div>" +
+                                            "<div class='col-2 token-info-col is-hidden backing-info'>" +
+                                                "Total Value  <span id='backed_value_total_" + element.key + "'>0.00</span>" +
+                                            "</div>" +
+                                            "<div class='col'>" +
+                                                "<div id='btn_start_backing_" + element.key + "' class='btn-start-backing button primary outline pull-right non-backed is-hidden'>" +
+                                                    "Start backing" +
+                                                "</div>" +
+                                                "<div id='btn_burn_" + element.key + "' class='btn-burn button primary outline backed pull-right is-hidden'>" +
+                                                    "Burn" +
+                                                "</div>" +
+                                                "<div id='btn_validate_" + element.key + "' class='btn-validate button primary outline backed pull-right is-hidden'>" +
+                                                    "Validate" +
+                                                "</div>" +
+                                                "<div id='btn_add_backing_" + element.key +  "' class='btn-add-backing button primary outline backed pull-right is-hidden'>" +
+                                                    "Add Funds" +
+                                                "</div>" +
+                                            "</div>" +
                                         "</div>" +
-                                        "<div class='col-2 token-info-col is-hidden backing-info'>" +
-                                            "Total Value  <span id='backed_value_total_" + element.key + "'>0.00</span>" +
-                                        "</div>" +
-                                        "<div class='col'>" +
-                                            "<div id='btn_start_backing_" + element.key + "' class='btn-start-backing button primary outline pull-right non-backed is-hidden'>" +
-                                                "Start backing" +
-                                            "</div>" +
-                                            "<div id='btn_burn_" + element.key + "' class='btn-burn button primary outline backed pull-right is-hidden'>" +
-                                                "Burn" +
-                                            "</div>" +
-                                            "<div id='btn_validate_" + element.key + "' class='btn-validate button primary outline backed pull-right is-hidden'>" +
-                                                "Validate" +
-                                            "</div>" +
-                                            "<div class='button primary outline backed pull-right is-hidden'>" +
-                                                "Add Funds" +
-                                            "</div>" +
-                                        "</div>" +
-                                    "</div>" +
-                                "</div>" 
-                            );
+                                    "</div>" 
+                                );
+                            }
+                            else
+                            {
+                            }
                         });
-
 
                         $('.btn-start-backing').on('click', (e)=>
                         {
-                            coinbackedApp.togglePopup('#popup-start-backing-info');
+                            coinbackedApp.togglePopup('#popup-start-backing-info', ()=>
+                            {
+                                let mintKey = new solanaWeb3.PublicKey(e.target.id.split("_")[3]);
+                                
+                                let connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
+                                let api = new coinbackedWeb3.api(connection);
+                                let instructionsAPI = new coinbackedWeb3.instructions(api);
+
+                                instructionsAPI.creationInstructions(mintKey, coinbackedApp.publicKey, BigInt(500000000)).then((instructions)=>
+                                {
+                                    coinbackedApp.runInstructions(instructions, (signature) =>
+                                    {
+                                        $('#popup-results-logs').text(signature);
+                                        coinbackedApp.togglePopup('#popup-results');
+                                    });
+                                }); 
+                            });
+                        });
+
+                        $('.btn-add-backing').on('click', (e)=>
+                        {
+                            coinbackedApp.togglePopup('#popup-add-info', ()=>
+                            {
+                                let mintKey = new solanaWeb3.PublicKey(e.target.id.split("_")[3]);
+                                
+                                let connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
+                                let api = new coinbackedWeb3.api(connection);
+                                let instructionsAPI = new coinbackedWeb3.instructions(api);
+
+                                instructionsAPI.addBackingLamportsInstructions(mintKey, coinbackedApp.publicKey, BigInt(500000000)).then((instructions)=>
+                                {
+                                    coinbackedApp.runInstructions(instructions, (signature) =>
+                                    {
+                                        $('#popup-results-logs').text(signature);
+                                        coinbackedApp.togglePopup('#popup-results');
+                                    });
+                                }); 
+                            });
                         });
 
                         $('.btn-validate').on('click', (e)=>
@@ -155,17 +202,32 @@ coinbackedApp =
                                 {
                                     coinbackedApp.runInstructions(instructions, (signature) =>
                                     {
-                                        $('#popup-validation-results-logs').text(signature);
-                                        coinbackedApp.togglePopup('#popup-validation-results');
+                                        $('#popup-results-logs').text(signature);
+                                        coinbackedApp.togglePopup('#popup-results');
                                     });
-                                });
-                                
+                                }); 
                             });
                         });
 
                         $('.btn-burn').on('click', (e)=>
                         {
-                            alert(e.target.id.split("_")[2])
+                            coinbackedApp.togglePopup('#popup-burn-info', ()=>
+                            {
+                                let mintKey = new solanaWeb3.PublicKey(e.target.id.split("_")[2]);
+                                
+                                let connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
+                                let api = new coinbackedWeb3.api(connection);
+                                let instructionsAPI = new coinbackedWeb3.instructions(api);
+
+                                instructionsAPI.burnInstructions(mintKey, coinbackedApp.publicKey, BigInt(1)).then((instructions)=>
+                                {
+                                    coinbackedApp.runInstructions(instructions, (signature) =>
+                                    {
+                                        $('#popup-results-logs').text(signature);
+                                        coinbackedApp.togglePopup('#popup-results');
+                                    });
+                                }); 
+                            });                        
                         });
 
                         $('#hero-intro').hide();
@@ -283,7 +345,7 @@ coinbackedApp =
     shortenPublicKeyString: function(key)
     {
         let base = key.toBase58();
-        return(base.substr(0, 4) + '...' + base.substr(base.length - 4));
+        return(base.substr(0, 5) + '...' + base.substr(base.length - 5));
     },
 
     togglePopup: function(id, nextBlock = ()=>{})

@@ -270,6 +270,7 @@ export class Instructions
     private static _OPERATION_VALIDATE_ACCOUNT:number = 1;
     private static _OPERATION_ADD_TO_BACKING_ACCOUNT:number = 2;
     private static _OPERATION_BURN:number = 3;
+    private static _OPERATION_CLEAN:number = 4;
 
     private static _TOKEN_PROGRAM_ID: solanaWeb3.PublicKey = new solanaWeb3.PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
 
@@ -313,7 +314,6 @@ export class Instructions
             });
         });
     }
-
     
     addBackingLamportsInstructions(mintKey: solanaWeb3.PublicKey, feePayer: solanaWeb3.PublicKey, backingLamports: bigint): Promise<[solanaWeb3.TransactionInstruction]>
     {
@@ -346,8 +346,7 @@ export class Instructions
         });
     }
     
-
-    burnInstructions(mintKey: solanaWeb3.PublicKey, owner: solanaWeb3.PublicKey,)
+    burnInstructions(mintKey: solanaWeb3.PublicKey, owner: solanaWeb3.PublicKey, amountToBurn: bigint)
     {
         return new Promise((resolve, reject) =>
         {
@@ -358,14 +357,20 @@ export class Instructions
             {
                 const transactionData = Buffer.alloc(137);
                 transactionData.writeInt8(Instructions._OPERATION_BURN, 0);
+                transactionData.writeBigInt64LE(amountToBurn, 1);
                 /* TODO ToS missing */
 
-                resolve([new solanaWeb3.TransactionInstruction(
+                const transactionData2 = Buffer.alloc(1);
+                transactionData2.writeInt8(Instructions._OPERATION_CLEAN, 0);
+
+
+                resolve([
+                    new solanaWeb3.TransactionInstruction(
                     {
                         keys: [
                             {pubkey: owner, isSigner: true, isWritable: true},
-                            {pubkey: mintKey, isSigner: false, isWritable: false},
-                            {pubkey: tokenAccountKey, isSigner: false, isWritable: false},
+                            {pubkey: mintKey, isSigner: false, isWritable: true},
+                            {pubkey: tokenAccountKey, isSigner: false, isWritable: true},
                             {pubkey: backingAccountKey, isSigner: false, isWritable: true},
                             {pubkey: treasuryAccountKey, isSigner: false, isWritable: true},
 
@@ -374,7 +379,24 @@ export class Instructions
                         ],
                         programId: coinbackedWeb3.PROGRAM_ID,
                         data: transactionData,
-                    })]);
+                    }),
+                    /*
+                    new solanaWeb3.TransactionInstruction(
+                    {
+                        keys: [
+                            {pubkey: owner, isSigner: true, isWritable: true},
+                            {pubkey: tokenAccountKey, isSigner: false, isWritable: true},
+                            {pubkey: backingAccountKey, isSigner: false, isWritable: true},
+                            {pubkey: treasuryAccountKey, isSigner: false, isWritable: true},
+
+                            {pubkey: Instructions._TOKEN_PROGRAM_ID, isSigner: false, isWritable: false},
+                            {pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false}
+                        ],
+                        programId: coinbackedWeb3.PROGRAM_ID,
+                        data: transactionData2,
+                    })
+                    */
+                    ]);
             }).catch((e) =>
             {
                 reject("Could not create instruction.")

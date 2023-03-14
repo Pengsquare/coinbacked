@@ -1,9 +1,9 @@
 <div class="modal is-hidden" id="popup-alpha">
     <div class="modal-content">
-        <div class="card">
-            <header><h4>Hi there!</h4></header>
+        <div class="card bg-error text-white">
+            <header><h4>ALPHA WARNING</h4></header>
             <p> 
-                We are still in early alpha! The whole app runs on devnet only. If you don't understand what that means, it might be too early to play around with coinbacked.
+                We are still in early alpha! The whole app runs on Devnet only. If you don't understand what that means, it might be too early to play around with coinbacked. If you want to learn more, check the documentation and the Github repository.
                 <br/><br/>
                 The team
             </p>
@@ -25,7 +25,7 @@
             </p>
             <footer class="is-right">
                 <div class="button outline popup-okay">Cancel</div>
-                <div class="button primary popup-okay">Yes, let's go</div>
+                <div class="button primary popup-continue">Yes, let's go</div>
             </footer>   
         </div>
     </div>
@@ -46,15 +46,48 @@
     </div>
 </div>
 
-<div class="modal is-hidden" id="popup-validation-results">
+<div class="modal is-hidden" id="popup-results">
     <div class="modal-content">
         <div class="card">
-            <header><h4>Validation Results</h4></header>
-            <p id="popup-validation-results-logs"> 
+            <header><h4>Results</h4></header>
+            <p id="popup-results-logs"> 
 
             </p>
             <footer class="is-right">
                 <div class="button outline popup-okay">Okay</div>
+            </footer>   
+        </div>
+    </div>
+</div>
+
+
+<div class="modal is-hidden" id="popup-burn-info">
+    <div class="modal-content">
+        <div class="card">
+            <header><h4>Really burn?</h4></header>
+            <p> 
+                By burning this token, you'll delete this token permantely. The backed value will be freed and added to your wallet account.
+            </p>
+            <footer class="is-right">
+                <div class="button outline popup-okay">Cancel</div>
+                <div class="button primary popup-continue">Yes, let's go</div>
+            </footer>   
+        </div>
+    </div>
+</div>
+
+<div class="modal is-hidden" id="popup-add-info">
+    <div class="modal-content">
+        <div class="card">
+            <header><h4>Really add more?</h4></header>
+            <p> 
+                When you add additional backing SOL, this amount will be locked in and can only be retrieved by burning the token.
+                <br/><br/>
+                Would you like to add 0.5SOL to backing?
+            </p>
+            <footer class="is-right">
+                <div class="button outline popup-okay">Cancel</div>
+                <div class="button primary popup-continue">Yes, let's go</div>
             </footer>   
         </div>
     </div>
